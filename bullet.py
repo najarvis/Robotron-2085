@@ -47,7 +47,9 @@ class Bullet(pygame.sprite.Sprite):
         bullet_image = pygame.Surface((w, h))
 
         # Calculate the coordinates of the start and end of the line
-        start_im = pygame.math.Vector2((w / 2, h / 2)) - self.velocity * (length / 2)
-        end_im = pygame.math.Vector2((w / 2, h / 2)) + self.velocity * (length / 2)
-        pygame.draw.line(bullet_image, (255, 255, 255), start_im, end_im)
+        # by starting in the center and going half the length in the self.velocity
+        # and the -self.velocity directions.
+        start_vec = pygame.math.Vector2((w / 2, h / 2))
+        offset_vec = self.velocity * (length / 2)
+        pygame.draw.line(bullet_image, (255, 255, 255), start_vec - offset_vec, start_vec + offset_vec)
         return bullet_image

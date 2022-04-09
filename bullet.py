@@ -8,9 +8,6 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, vel, screen_rect):
         pygame.sprite.Sprite.__init__(self)
 
-        bullet_image = pygame.Surface((32, 8))
-        bullet_image.fill((255, 255, 255))
-
         self.position = pygame.math.Vector2(pos)
         self.velocity = vel
         self.speed = 1000

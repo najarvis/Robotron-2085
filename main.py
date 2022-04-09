@@ -26,11 +26,7 @@ def run():
 
     bullet_group = pygame.sprite.Group()
 
-    enemies = []
-    generate_enemies(enemies, 20)
-    # 20 enemies spawn randomly on the right half of the screen
-    #enemies = [Enemy((random.randint(WIDTH / 2, WIDTH), 
-    #                random.randint(0, HEIGHT))) for i in range(20)]
+    generate_enemies(enemies := [], 20)
     enemy_group = pygame.sprite.Group(*enemies)
 
     # -- Main game loop --
@@ -77,7 +73,8 @@ def run():
 
         pygame.display.update()
 
-def generate_enemies(enemy_array, num, difficulty=None):
+def generate_enemies(enemy_array, num):
+    """Generates `num` enemies randomly around the center of the screen and adds them to `enemy_array`"""
     min_dimension = min(WIDTH, HEIGHT)
     for i in range(num):
         random_angle = random.uniform(0, math.pi * 2) # random angle on unit circle

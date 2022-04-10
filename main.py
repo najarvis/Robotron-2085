@@ -5,6 +5,7 @@ import math
 from player import Player
 from bullet import Bullet
 from enemy import BaseEnemy
+from family import FamilyMember
 
 # "Global" variables
 SCREEN_SIZE = WIDTH, HEIGHT = (1600, 900)
@@ -14,20 +15,26 @@ def run():
     """Put the main game logic in a function, to make it more `pythonic`"""
 
     # -- Setup --
-    # Moved this into the function, no need for it to be a global variable, don't want 
-    # to initialize the video if this file is imported.
+    pygame.init()
+
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
     done = False
 
+    shoot_sound = pygame.mixer.Sound("sounds/shoot.wav")
+    explosion_sound = pygame.mixer.Sound("sounds/explode.wav")
+
     # -- Groups --
-    main_player = Player(SCREEN_RECT.center)
+    main_player = Player(SCREEN_RECT.center, SCREEN_RECT)
     player_group = pygame.sprite.Group(main_player)
 
     bullet_group = pygame.sprite.Group()
 
     generate_enemies(enemies := [], 20)
     enemy_group = pygame.sprite.Group(*enemies)
+
+    family_members = [FamilyMember((WIDTH / 4, HEIGHT / 2), SCREEN_RECT)]
+    family_group = pygame.sprite.Group(*family_members)
 
     # -- Main game loop --
     while not done:
@@ -49,24 +56,27 @@ def run():
                 if event.button == 1: # Left mouse button
                     # Get the components for the new bullet
                     pos, vel = main_player.shoot_at(event.pos)
-                    new_bullet = Bullet(pos, vel, SCREEN_RECT)
+                    new_bullet = Bullet(pos, vel, SCREEN_RECT, explosion_sound)
                     bullet_group.add(new_bullet)
+                    shoot_sound.play()
                     
         # Update all entities
         pressed_keys = pygame.key.get_pressed()
         player_group.update(delta, pressed_keys)
         bullet_group.update(delta, enemy_group)
         enemy_group.update(delta, main_player)
+        family_group.update(delta)
 
         # Resolve player colisions here now that everything is done moving
         if (collided_enemy := pygame.sprite.spritecollideany(main_player, enemy_group)) is not None:
-            main_player.kill()
+            # main_player.kill()
             print("YOU DIED")
 
         # Fill the screen with black to reset it.
         screen.fill((0, 0, 0))
 
         # Draw all entities
+        family_group.draw(screen)
         player_group.draw(screen)
         bullet_group.draw(screen)
         enemy_group.draw(screen)

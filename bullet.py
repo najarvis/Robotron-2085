@@ -5,7 +5,7 @@ class Bullet(pygame.sprite.Sprite):
     it goes off the screen or intersects with an enemy.
     """
 
-    def __init__(self, pos, vel, screen_rect):
+    def __init__(self, pos, vel, screen_rect, explosion_sound):
         pygame.sprite.Sprite.__init__(self)
 
         self.position = pygame.math.Vector2(pos)
@@ -20,6 +20,8 @@ class Bullet(pygame.sprite.Sprite):
         # Rectangle representing the bounds of the screen
         self.screen_rect = screen_rect
 
+        self.explosion_sound = explosion_sound
+
     def update(self, delta, enemies):
         self.position += self.velocity * self.speed * delta
         self.rect.center = self.position
@@ -33,6 +35,7 @@ class Bullet(pygame.sprite.Sprite):
         if (collided_enemy := pygame.sprite.spritecollideany(self, enemies)) is not None:
             collided_enemy.kill()
             self.kill()
+            self.explosion_sound.play()
 
     def get_bullet_image(self):
         """Create an image and align it along the direction the bullet is traveling"""

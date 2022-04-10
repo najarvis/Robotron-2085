@@ -39,9 +39,15 @@ class Player(pygame.sprite.Sprite):
             self.position += vel.normalize() * self.speed * delta
             self.rect.center = self.position
 
-        # Prevent them from wandering off screen
-        self.rect = self.rect.clamp(self.screen_rect)
-        self.position.update(self.rect.center)
+        # Prevent them from wandering off screen. Keep track of the old
+        # rectangle so we can tell if the clamp actually modified the rect.
+        old_rect = self.rect.copy()
+        self.rect.clamp_ip(self.screen_rect)
+        if old_rect != self.rect:
+            # If we always update the position, any time the player moves
+            # less than 1 pixel in the positive direction, it will round down
+            # (since Rects use integer coordinates)
+            self.position.update(self.rect.center) 
 
     def shoot_at(self, aiming_pos):
         """Returns the position and direction of a bullet fired from the center

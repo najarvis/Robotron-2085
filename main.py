@@ -1,23 +1,32 @@
 import pygame
 import random
 import math
+from typing import Union
 
 from player import Player
 from bullet import Bullet
-from enemy import BaseEnemy
+from enemy import BaseEnemy, Electrode, Grunt
 from family import FamilyMember
 
+import helper_funcs
+
 # "Global" variables
-SCREEN_SIZE = WIDTH, HEIGHT = (1600, 900)
+SCREEN_SIZE = WIDTH, HEIGHT = (800, 800)
 SCREEN_RECT = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
-def run():
+# I haven't done this before, but I'm learning type annotation in Python.
+# This is basically saying the type could be any of these.
+EnemyType = Union[BaseEnemy, Electrode, Grunt]
+
+def run() -> None:
     """Put the main game logic in a function, to make it more `pythonic`"""
 
     # -- Setup --
     pygame.init()
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_caption("ROBOTRON: 2085")
+
     clock = pygame.time.Clock()
     done = False
 
@@ -33,7 +42,7 @@ def run():
     generate_enemies(enemies := [], 20)
     enemy_group = pygame.sprite.Group(*enemies)
 
-    family_members = [FamilyMember((WIDTH / 4, HEIGHT / 2), SCREEN_RECT)]
+    generate_family(family_members := [], 4)
     family_group = pygame.sprite.Group(*family_members)
 
     # -- Main game loop --
@@ -55,7 +64,7 @@ def run():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1: # Left mouse button
                     # Get the components for the new bullet
-                    pos, vel = main_player.shoot_at(event.pos)
+                    pos, vel = helper_funcs.shoot_at(main_player.position, event.pos)
                     new_bullet = Bullet(pos, vel, SCREEN_RECT, explosion_sound)
                     bullet_group.add(new_bullet)
                     shoot_sound.play()
@@ -83,15 +92,27 @@ def run():
 
         pygame.display.update()
 
-def generate_enemies(enemy_array, num):
+    # -- Clean Up --
+    pygame.quit()
+
+def generate_enemies(enemy_array: list[EnemyType], num: int) -> None:
     """Generates `num` enemies randomly around the center of the screen and adds them to `enemy_array`"""
     min_dimension = min(WIDTH, HEIGHT)
-    for i in range(num):
-        random_angle = random.uniform(0, math.pi * 2) # random angle on unit circle
-        random_dist = random.uniform(min_dimension / 4, min_dimension / 2) # Spawn anywhere from the edge of the map to halfway to the player
-        enemy_pos_x = SCREEN_RECT.centerx + math.cos(random_angle) * random_dist
-        enemy_pos_y = SCREEN_RECT.centery + math.sin(random_angle) * random_dist
-        enemy_array.append(BaseEnemy((enemy_pos_x, enemy_pos_y)))
+    min_radius = min_dimension / 4
+    max_radius = min_dimension / 2
+    for _ in range(num):
+        enemy_pos = helper_funcs.random_radial_coord(SCREEN_RECT.center, min_radius, max_radius)
+        enemy_type = random.choice([Grunt, Electrode])
+        enemy_array.append(enemy_type(enemy_pos, SCREEN_RECT))
+
+def generate_family(family_array: list[FamilyMember], num: int) -> None:
+    """Generates `num` FamilyMembers randomly around the center of the screen and adds them to `family_array`"""
+    min_dimension = min(WIDTH, HEIGHT)
+    min_radius = min_dimension / 4
+    max_radius = min_dimension / 2
+    for _ in range(num):
+        family_pos = helper_funcs.random_radial_coord(SCREEN_RECT.center, min_radius, max_radius)
+        family_array.append(FamilyMember(family_pos, SCREEN_RECT))
 
 # Use the standard way of calling our code. Prevents this from being an issue if imported.
 if __name__ == "__main__":

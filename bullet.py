@@ -1,13 +1,15 @@
 import pygame
+import helper_funcs
 
 class Bullet(pygame.sprite.Sprite):
     """Bullet fired from the player. Travels at a constant speed in a straight line until
     it goes off the screen or intersects with an enemy.
     """
 
-    def __init__(self, pos, vel, screen_rect, explosion_sound):
+    def __init__(self, pos: helper_funcs.CoordType, vel: pygame.math.Vector2, screen_rect: pygame.Rect, explosion_sound: pygame.mixer.Sound):
         pygame.sprite.Sprite.__init__(self)
 
+        # TODO: Maybe make pos and vel the same type to avoid confusion
         self.position = pygame.math.Vector2(pos)
         self.velocity = vel
         self.speed = 1000
@@ -22,7 +24,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.explosion_sound = explosion_sound
 
-    def update(self, delta, enemies):
+    def update(self, delta: float, enemies: pygame.sprite.Group) -> None:
         self.position += self.velocity * self.speed * delta
         self.rect.center = self.position
 
@@ -37,7 +39,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
             self.explosion_sound.play()
 
-    def get_bullet_image(self):
+    def get_bullet_image(self) -> pygame.Surface:
         """Create an image and align it along the direction the bullet is traveling"""
 
         # Create an image large enough to hold the rotated bullet

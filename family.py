@@ -1,5 +1,6 @@
 import pygame
 import random
+import helper_funcs
 
 class FamilyMember(pygame.sprite.Sprite):
     """Family members wander the screen, waiting to be rescued by the player.
@@ -13,7 +14,7 @@ class FamilyMember(pygame.sprite.Sprite):
                      pygame.math.Vector2((-1, 0)),
                      pygame.math.Vector2((0, -1))]
 
-    def __init__(self, pos, screen_rect):
+    def __init__(self, pos: helper_funcs.CoordType, screen_rect: pygame.Rect):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.Surface((32, 32))
@@ -31,23 +32,15 @@ class FamilyMember(pygame.sprite.Sprite):
 
         self.screen_rect = screen_rect
 
-    def update(self, delta):
+    def update(self, delta: float) -> None:
         # Move in the same direction for self.direction_timer_max seconds, then
         # pick a new direction (or none, if the (0, 0) vector is chosen)
         self.direction_timer -= delta
         if self.direction_timer <= 0:
             self.velocity = random.choice(FamilyMember.VELOCITY_OPTS)
-            self.direction_timer = self.direction_timer_max
+            self.direction_timer = self.direction_timer_max + random.random()
 
         self.position += self.velocity * self.speed * delta
         self.rect.center = self.position
 
-        # Prevent them from wandering off screen. Keep track of the old
-        # rectangle so we can tell if the clamp actually modified the rect.
-        old_rect = self.rect.copy()
-        self.rect.clamp_ip(self.screen_rect)
-        if old_rect != self.rect:
-            # If we always update the position, any time the FamilyMember moves
-            # less than 1 pixel in the positive direction, it will round down
-            # (since Rects use integer coordinates)
-            self.position.update(self.rect.center) 
+        helper_funcs.affix_to_screen(self)

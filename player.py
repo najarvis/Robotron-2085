@@ -1,8 +1,9 @@
 import pygame
+import helper_funcs
 
 class Player(pygame.sprite.Sprite):
     
-    def __init__(self, pos, screen_rect):
+    def __init__(self, pos: helper_funcs.CoordType, screen_rect: pygame.Rect):
         pygame.sprite.Sprite.__init__(self)
 
         # Need to use .convert here to make it play nicely with pygame. Not exactly sure what it does but you get a big performance
@@ -19,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 
         self.screen_rect = screen_rect
 
-    def update(self, delta, pressed_keys):
+    def update(self, delta: float, pressed_keys: list[bool]) -> None:
         """Update the player's position based on the keys being pressed."""
 
         # Use a velocity instead of updating the player's position directly, so we
@@ -34,26 +35,14 @@ class Player(pygame.sprite.Sprite):
         if pressed_keys[pygame.K_d]:
             vel.x += 1
 
+        # To avoid conditionals we could rewrite the above as:
+        # truths = {True: 1, False: 0}
+        # vel.y += truths[pressed_keys[pygame.K_s]] - truths[pressed_keys[pygame.K_w]]
+        # vel.x += truths[pressed_keys[pygame.K_d]] - truths[pressed_keys[pygame.K_a]]
+
         # If the player wants to move, move them at `self.speed` pixels/second
         if vel.magnitude() != 0:
             self.position += vel.normalize() * self.speed * delta
             self.rect.center = self.position
 
-        # Prevent them from wandering off screen. Keep track of the old
-        # rectangle so we can tell if the clamp actually modified the rect.
-        old_rect = self.rect.copy()
-        self.rect.clamp_ip(self.screen_rect)
-        if old_rect != self.rect:
-            # If we always update the position, any time the player moves
-            # less than 1 pixel in the positive direction, it will round down
-            # (since Rects use integer coordinates)
-            self.position.update(self.rect.center) 
-
-    def shoot_at(self, aiming_pos):
-        """Returns the position and direction of a bullet fired from the center
-        of the player towards aiming_pos.
-        """
-        pos = pygame.math.Vector2(self.position)
-        vel = (pygame.math.Vector2(aiming_pos) - self.position).normalize()
-
-        return pos, vel
+        helper_funcs.affix_to_screen(self)

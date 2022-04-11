@@ -1,0 +1,23 @@
+Putting some ideas in here to keep track of
+
+Is this a sequel to Robotron 2084 or a remake?
+
+If remake, we still have a lot of work to do if we want to be faithful:
+  - Really should only be able to fire and move in 8 directions
+  - Missing Enemies:
+    - Hulks - Kill humans and cannot be destroyed. Can be knocked back by shooting them.
+    - Enforcers - Don't target the player directly, target area near them w/ random acceleration.
+      - Spheroid (Enforcer generator)
+    - Brains - Capture humans, convert them to "Progs", can also launch cruise missles at player.
+    - Tanks - Fires projectiles that bounce around the screen
+      - Quarks (Tank generator)
+  - Level / Wave system
+  - Lives system
+  - Scoring system
+  - Menu, possibly with exposition
+  - Screen transition effects
+  - Unique family members (though I don't think they have different behaviors)
+  - The Arcade screen was only like 360x280 pixels. We could render to a smaller surface and then scale it to the full size
+
+
+Sounds were made using a free program called bfxr

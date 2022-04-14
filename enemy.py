@@ -1,6 +1,5 @@
 import pygame
 import helper_funcs
-from player import Player
 
 class BaseEnemy(pygame.sprite.Sprite):
 
@@ -20,11 +19,11 @@ class BaseEnemy(pygame.sprite.Sprite):
 
         self.screen_rect = screen_rect
 
-    def update(self, delta: float, main_player: Player) -> None:
-        """Updates the position of the enemy"""
+    def update(self, delta: float, target_pos: helper_funcs.CoordType) -> None:
+        """Updates the position of the enemy. Moves towards target_pos."""
 
         # Move directly towards the player's current position
-        vel = (main_player.position - self.position).normalize()
+        vel = (target_pos - self.position).normalize()
         self.position += vel * self.speed * delta
 
         self.rect.center = self.position
@@ -49,3 +48,4 @@ class Grunt(BaseEnemy):
     def __init__(self, pos: helper_funcs.CoordType, screen_rect: pygame.Rect):
         BaseEnemy.__init__(self, pos, screen_rect)
         self.speed = 100
+

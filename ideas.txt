@@ -17,7 +17,7 @@ If remake, we still have a lot of work to do if we want to be faithful:
   - Menu, possibly with exposition
   - Screen transition effects
   - Unique family members (though I don't think they have different behaviors)
-  - The Arcade screen was only like 360x280 pixels. We could render to a smaller surface and then scale it to the full size
+  - The Arcade screen was only like 360x280 pixels. We could render to a smaller surface and then scale it to the full size. Would make art easier too.
 
 
 Sounds were made using a free program called bfxr

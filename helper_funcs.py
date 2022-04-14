@@ -1,12 +1,9 @@
 import pygame
 import random
-import math
 
-from typing import Union
+CoordType = tuple[int, int] | tuple[float, float] | pygame.math.Vector2
 
-CoordType = Union[tuple[int, int], tuple[float, float], pygame.math.Vector2]
-
-def affix_to_screen(sprite_obj):
+def affix_to_screen(sprite_obj: pygame.sprite.Sprite) -> None:
     """Prevents a sprite from wandering off screen. Keeps track of the old
     rectangle so we only update the position if the clamp modified the rect.
     """
@@ -34,11 +31,22 @@ def shoot_at(start_pos: CoordType, aiming_pos: CoordType) -> tuple[pygame.math.V
 
     return pos, vel
 
-def random_radial_coord(center: CoordType, min_radius: float, max_radius: float) -> tuple[float, float]:
+def random_radial_coord(center: CoordType, min_radius: float, max_radius: float) -> pygame.math.Vector2:
     """Returns a random coordinate between min_radius and max_radius pixels away from center"""
 
-    random_angle = random.uniform(0, math.pi * 2) # random angle on unit circle
+    random_angle = random.uniform(0, 360) # random angle on unit circle
     random_dist = random.uniform(min_radius, max_radius) # Spawn anywhere from the edge of the map to halfway to the player
-    enemy_pos_x = center[0] + math.cos(random_angle) * random_dist
-    enemy_pos_y = center[1] + math.sin(random_angle) * random_dist
-    return (enemy_pos_x, enemy_pos_y)
+    return pygame.math.Vector2(center) + vec2_from_polar(random_dist, random_angle)
+
+def vec2_from_polar(r: float, phi: float):
+    """Returns a Vector2 r units away and phi degrees offset from the origin"""
+
+    vec = pygame.math.Vector2()
+    vec.from_polar((r, phi))
+    return vec
+
+def generate_rand_coords(spawn_rect: pygame.Rect, num: int, min_percent: float = 0.5, max_percent: float = 1.0) -> list[tuple[float, float]]:
+    min_dim = min(spawn_rect.width, spawn_rect.height)
+    min_radius = min_dim * min_percent / 2
+    max_radius = min_dim * max_percent / 2
+    return [random_radial_coord(spawn_rect.center, min_radius, max_radius) for _ in range(num)]

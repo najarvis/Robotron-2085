@@ -6,11 +6,13 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos: helper_funcs.CoordType, screen_rect: pygame.Rect):
         pygame.sprite.Sprite.__init__(self)
 
-        # Need to use .convert here to make it play nicely with pygame. Not exactly sure what it does but you get a big performance
-        # hit for not calling it.
+        # Need to use .convert here to make it play nicely with pygame. Not 
+        # exactly sure what it does but you get a big performance hit for not 
+        # calling it.
         self.image = pygame.image.load("imgs/Player.png").convert()
 
-        # by putting pos in the pygame.math.Vector2 constructor we make sure it is not sharing a reference with another entity.
+        # by putting pos in the pygame.math.Vector2 constructor we make sure it
+        # is not sharing a reference with another entity.
         self.position = pygame.math.Vector2(pos)
 
         self.rect = self.image.get_rect()
@@ -36,9 +38,8 @@ class Player(pygame.sprite.Sprite):
             vel.x += 1
 
         # To avoid conditionals we could rewrite the above as:
-        # truths = {True: 1, False: 0}
-        # vel.y += truths[pressed_keys[pygame.K_s]] - truths[pressed_keys[pygame.K_w]]
-        # vel.x += truths[pressed_keys[pygame.K_d]] - truths[pressed_keys[pygame.K_a]]
+        # vel.y += int(pressed_keys[pygame.K_s]) - int(pressed_keys[pygame.K_w])
+        # vel.x += int(pressed_keys[pygame.K_d]) - int(pressed_keys[pygame.K_a])
 
         # If the player wants to move, move them at `self.speed` pixels/second
         if vel.magnitude() != 0:

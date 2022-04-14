@@ -2,11 +2,13 @@ import pygame
 import helper_funcs
 
 class Bullet(pygame.sprite.Sprite):
-    """Bullet fired from the player. Travels at a constant speed in a straight line until
-    it goes off the screen or intersects with an enemy.
+    """Bullet fired from the player. Travels at a constant speed in a
+    straight line until it goes off the screen or intersects with an
+    enemy.
     """
 
-    def __init__(self, pos: helper_funcs.CoordType, vel: pygame.math.Vector2, screen_rect: pygame.Rect, explosion_sound: pygame.mixer.Sound):
+    def __init__(self, pos: helper_funcs.CoordType, vel: pygame.math.Vector2, 
+                 screen_rect: pygame.Rect, explosion_sound: pygame.mixer.Sound):
         pygame.sprite.Sprite.__init__(self)
 
         # TODO: Maybe make pos and vel the same type to avoid confusion
@@ -28,19 +30,23 @@ class Bullet(pygame.sprite.Sprite):
         self.position += self.velocity * self.speed * delta
         self.rect.center = self.position
 
-        # If we are not colliding with the screen rectangle, we are outside of it, and thus the bullet can despawn
+        # If we are not colliding with the screen rectangle, we are outside of
+        # it, and thus the bullet can despawn
         if not self.screen_rect.colliderect(self.rect):
             self.kill()
 
-        # Check if we collide with any enemies. Walrus operator here returns what collided_enemy is set to,
-        # Which is None in the event of no collision or an enemy sprite if there is one.
+        # Check if we collide with any enemies. Walrus operator here returns
+        # what collided_enemy is set to, which is None in the event of no 
+        # collision or an enemy sprite if there is one.
         if (collided_enemy := pygame.sprite.spritecollideany(self, enemies)) is not None:
             collided_enemy.kill()
             self.kill()
             self.explosion_sound.play()
 
     def get_bullet_image(self) -> pygame.Surface:
-        """Create an image and align it along the direction the bullet is traveling"""
+        """Create an image and align it along the direction the bullet
+        is traveling
+        """
 
         # Create an image large enough to hold the rotated bullet
         length = 24 # pixels
@@ -53,5 +59,9 @@ class Bullet(pygame.sprite.Sprite):
         # and the -self.velocity directions.
         start_vec = pygame.math.Vector2((w / 2, h / 2))
         offset_vec = self.velocity * (length / 2)
-        pygame.draw.line(bullet_image, (255, 255, 255), start_vec - offset_vec, start_vec + offset_vec)
+        
+        # I take back what I said about pygame not supporting vectors in their
+        # built-in's. So glad I don't have to do this manually
+        pygame.draw.line(bullet_image, (255, 255, 255), 
+                         start_vec - offset_vec, start_vec + offset_vec) 
         return bullet_image

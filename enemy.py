@@ -41,7 +41,9 @@ class Electrode(BaseEnemy):
         self.image.fill((255, 255, 255))
 
 class Grunt(BaseEnemy):
-    """Moves towards player in a straight line. Can be destroyed by player by shooting."""
+    """Moves towards player in a straight line. Can be destroyed by
+    player by shooting.
+    """
 
     reward = 200
 

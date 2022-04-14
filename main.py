@@ -1,5 +1,4 @@
 import pygame
-import random
 
 from enemy import Electrode, Grunt
 from family import FamilyMember
@@ -24,12 +23,13 @@ def run() -> None:
     clock = pygame.time.Clock()
     done = False
 
+    # Game director holds the state of the game, and handles the major functions.
     game_director = Director(SCREEN_RECT)
 
     level1_dict = {
-        Electrode: helper_funcs.generate_rand_coords(SCREEN_RECT, 10),
-        Grunt: helper_funcs.generate_rand_coords(SCREEN_RECT, 10),
-        Player: [SCREEN_RECT.center],
+        Electrode:    helper_funcs.generate_rand_coords(SCREEN_RECT, 10),
+        Grunt:        helper_funcs.generate_rand_coords(SCREEN_RECT, 10),
+        Player:       [SCREEN_RECT.center],
         FamilyMember: helper_funcs.generate_rand_coords(SCREEN_RECT, 5)
     }
     game_director.load_level(level1_dict)

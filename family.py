@@ -1,11 +1,12 @@
-import pygame
 import random
+import pygame
 import helper_funcs
 
 class FamilyMember(pygame.sprite.Sprite):
-    """Family members wander the screen, waiting to be rescued by the player.
-    Can be killed by Hulks. When the player contacts a family member they get 200*x^n points,
-    where x is how many other family members they've picked up during that level.
+    """Family members wander the screen, waiting to be rescued by the
+    player. Can be killed by Hulks. When the player contacts a family
+    member they get 200*x^n points, where x is how many other family 
+    members they've picked up during that level.
     """
 
     VELOCITY_OPTS = [pygame.math.Vector2((0, 0)),

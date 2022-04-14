@@ -28,7 +28,7 @@ Typically dictionary in the form:
 
 class Director:
     """The director holds the state of the game internally, and handles
-    storing, updating, and rendering all game components."""
+    storing, updating, and drawing all game components."""
 
     def __init__(self, screen_rect: pygame.Rect):
         self.level_num = 0
@@ -40,6 +40,7 @@ class Director:
         self.player_group = pygame.sprite.Group()
         self.bullet_group = pygame.sprite.Group()
 
+        # Spawn the player in the center even if no level is loaded (for debug purposes)
         self.player: Player = Player(screen_rect.center, screen_rect)
         self.player_group.add(self.player)
 
@@ -65,13 +66,12 @@ class Director:
             # main_player.kill()
             print("YOU DIED")
 
-    def load_level(self, level_dict: LevelType, clear=True) -> None:
+    def load_level(self, level_dict: LevelType, clear=True) -> bool:
         """Handle instanciating game components into memory given a
         mapping of types to sets of coordinates. Returns True if loading
         is successful, False otherwise.
         """
-
-        if Player not in level_dict:
+        if len(level_dict.get(Player, [])) != 1: # There must be exactly one player
             return False
 
         if clear:
@@ -81,22 +81,30 @@ class Director:
             self.bullet_group.empty()
             del self.player # should this be `self.player = None`?
 
+        # Loop through each instanciable type in the dict and handle instanciating them. 
         for obj_type in level_dict:
+            group: pygame.sprite.Group = None
+            if obj_type is Player:
+                # Have to handle this specially because we need to populate self.player
+                coord = level_dict[Player][0]
+                self.player = obj_type(coord, self.screen_rect) 
+                self.player_group.add(self.player)
+                continue
+
+            elif obj_type in get_args(EnemyType): # get_args returns what types make up the Union
+                group = self.enemy_group
+
+            elif obj_type is FamilyMember:
+                group = self.family_group
+
+            # Unsupported class type
+            else:
+                return False
+
+            # If it wasn't the player instanciate whatever was chosen and add them to their respective group.
             for coord in level_dict[obj_type]:
-                if obj_type in get_args(EnemyType): # get_args returns what types make up the Union
-                    new_enemy = obj_type(coord, self.screen_rect)
-                    self.enemy_group.add(new_enemy)
-
-                elif obj_type is Player:
-                    self.player = Player(coord, self.screen_rect)
-                    self.player_group.add(self.player)
-
-                elif obj_type is FamilyMember:
-                    new_family = FamilyMember(coord, self.screen_rect)
-                    self.family_group.add(new_family)
-
-                else:
-                    return False
+                new_instance = obj_type(coord, self.screen_rect)
+                group.add(new_instance)
 
         return True
 

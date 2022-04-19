@@ -22,20 +22,24 @@ class Player(pygame.sprite.Sprite):
 
         self.screen_rect = screen_rect
 
-    def update(self, delta: float, pressed_keys: list[bool]) -> None:
+    def update(self, delta: float, pressed_keys: list[bool], movement_vec: pygame.math.Vector2 = None) -> None:
         """Update the player's position based on the keys being pressed."""
 
         # Use a velocity instead of updating the player's position directly, so we
         # can normalize the direction.
         vel = pygame.math.Vector2()
-        if pressed_keys[pygame.K_w]:
-            vel.y -= 1
-        if pressed_keys[pygame.K_s]:
-            vel.y += 1
-        if pressed_keys[pygame.K_a]:
-            vel.x -= 1
-        if pressed_keys[pygame.K_d]:
-            vel.x += 1
+        if movement_vec is not None:
+            vel.xy = movement_vec.xy
+            
+        else:
+            if pressed_keys[pygame.K_w]:
+                vel.y -= 1
+            if pressed_keys[pygame.K_s]:
+                vel.y += 1
+            if pressed_keys[pygame.K_a]:
+                vel.x -= 1
+            if pressed_keys[pygame.K_d]:
+                vel.x += 1
 
         # To avoid conditionals we could rewrite the above as:
         # vel.y += int(pressed_keys[pygame.K_s]) - int(pressed_keys[pygame.K_w])

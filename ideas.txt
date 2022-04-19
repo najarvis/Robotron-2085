@@ -21,3 +21,29 @@ If remake, we still have a lot of work to do if we want to be faithful:
 
 
 Sounds were made using a free program called bfxr
+
+Notes about Xbox controller:
+  JoyButtonDown (buttons)
+    A - 0
+    B - 1
+    X - 2
+    Y - 3
+    Left Bumper          - 4
+    Right Bumper         - 5
+    Share / Select       - 6
+    Start                - 7
+    Clicking Left Stick  - 8
+    Clicking Right Stick - 9
+  JoyHatMotion (D-pad)
+    hat - 0 (only one d-pad)
+    left  - 'value': (-1, 0)
+    right - 'value': (1,  0)
+    up    - 'value': (0,  1)
+    down  - 'value': (0, -1)
+  JoyAxisMotion - Relative motion, value from -1 to 1
+    Left Analog Stick X axis  - Axis 0
+    Left Analog Stick Y axis  - Axis 1
+    Right Analog Stick X axis - Axis 2
+    Right Analog Stick Y axis - Axis 3
+    Left Trigger              - Axis 4
+    Right Trigger             - Axis 5

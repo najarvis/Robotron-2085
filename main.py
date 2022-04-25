@@ -37,7 +37,7 @@ def run() -> None:
     game_director.load_level(level1_dict)
 
     if pygame.joystick.get_count() > 0:
-        game_director.set_joystick(game_director.init_joystick(0))
+        game_director.set_joystick(Director.init_joystick(0))
 
     # -- Main game loop --
     while not done:

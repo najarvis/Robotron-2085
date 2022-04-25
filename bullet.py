@@ -1,5 +1,7 @@
+import random
 import pygame
 import helper_funcs
+from destroyed_entity import DestroyedEntityFactory
 
 class Bullet(pygame.sprite.Sprite):
     """Bullet fired from the player. Travels at a constant speed in a
@@ -26,7 +28,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.explosion_sound = explosion_sound
 
-    def update(self, delta: float, enemies: pygame.sprite.Group) -> None:
+    def update(self, delta: float, enemies: pygame.sprite.Group, destroyed_group: pygame.sprite.Group) -> None:
         self.position += self.velocity * self.speed * delta
         self.rect.center = self.position
 
@@ -39,6 +41,7 @@ class Bullet(pygame.sprite.Sprite):
         # what collided_enemy is set to, which is None in the event of no 
         # collision or an enemy sprite if there is one.
         if (collided_enemy := pygame.sprite.spritecollideany(self, enemies)) is not None:
+            DestroyedEntityFactory.create_destroyed_entities(destroyed_group, collided_enemy.position, collided_enemy.image, self.screen_rect, bool(random.randint(0, 1)))
             collided_enemy.kill()
             self.kill()
             self.explosion_sound.play()

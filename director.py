@@ -39,6 +39,7 @@ class Director:
         self.family_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.Group()
         self.bullet_group = pygame.sprite.Group()
+        self.destroyed_group = pygame.sprite.Group()
 
         # Spawn the player in the center even if no level is loaded (for debug purposes)
         self.player: Player = Player(screen_rect.center, screen_rect)
@@ -49,7 +50,7 @@ class Director:
         self.joystick = None
 
         self.reload_timer = 0
-        self.reload_timer_max = 0.25
+        self.reload_timer_max = 0.20 # How many seconds before the player can shoot again
 
         self.init_sounds()
 
@@ -63,9 +64,10 @@ class Director:
     def update(self, delta: float, pressed_keys: list[bool]) -> None:
         movement_vec, shooting_vec = self.get_joystick_vecs()
         self.player_group.update(delta, pressed_keys, movement_vec)
-        self.bullet_group.update(delta, self.enemy_group)
+        self.bullet_group.update(delta, self.enemy_group, self.destroyed_group)
         self.enemy_group.update(delta, self.player.position)
         self.family_group.update(delta)
+        self.destroyed_group.update(delta)
 
         if shooting_vec is not None and self.reload_timer <= 0:
             self.shoot(self.player.position + shooting_vec)
@@ -91,6 +93,7 @@ class Director:
             self.family_group.empty()
             self.player_group.empty()
             self.bullet_group.empty()
+            self.destroyed_group.empty()
             del self.player # should this be `self.player = None`?
 
         # Loop through each instanciable type in the dict and handle instanciating them. 
@@ -121,6 +124,7 @@ class Director:
         return True
 
     def draw(self, surface: pygame.Surface):
+        self.destroyed_group.draw(surface)
         self.enemy_group.draw(surface)
         self.family_group.draw(surface)
         self.player_group.draw(surface)
@@ -154,7 +158,18 @@ class Director:
     def remove_joystick(self) -> None:
         self.joystick = None
 
-    def get_joystick_vecs(self) -> tuple[pygame.math.Vector2, pygame.math.Vector2]:
+    def init_and_set_joystick(self, id: int):
+        self.set_joystick(Director.init_joystick(id))
+
+    def get_joystick_vecs(self) -> tuple[pygame.math.Vector2 | None, pygame.math.Vector2 | None]:
+        """Robotron is typically a "twin-stick" game, where one stick controls
+        the movement while the other controls the shooting. This code currently
+        works on an xbox one controller, as that is what I have for testing.
+        
+        Returns a tuple with two Vector2 instances, either of which may be None
+        if the magnitude is small enough (to avoid jitter).
+        """
+
         if self.joystick is None:
             return (None, None)
 
@@ -164,10 +179,12 @@ class Director:
         right_x_axis = joy.get_axis(2)
         right_y_axis = joy.get_axis(3)
     
+        # Adjust this min_value to avoid drift / jitter with the inputs.
         min_value = 0.1
-        # Movement with the left axis, shooting with the right axis
+
+        # Movement with the left analog stick, shooting with the right
         movement_vec = None
-        movement_magnitude = (left_x_axis * left_x_axis) + (left_y_axis * left_y_axis) # Hypotenuse
+        movement_magnitude = (left_x_axis * left_x_axis) + (left_y_axis * left_y_axis) # Hypotenuse (x^2 + y^2)
         if movement_magnitude >= min_value:
             movement_vec = pygame.math.Vector2(left_x_axis, left_y_axis)
             movement_vec.normalize_ip()    

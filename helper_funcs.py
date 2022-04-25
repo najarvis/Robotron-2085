@@ -54,6 +54,7 @@ def generate_rand_coords(spawn_rect: pygame.Rect, num: int, min_percent: float =
     radially in the rect.
     """
 
+    # `min_dim / 2` will tell us the minimum distance to the nearest wall (from the center)
     min_dim = min(spawn_rect.width, spawn_rect.height)
     min_radius = min_dim * min_percent / 2
     max_radius = min_dim * max_percent / 2
